@@ -1,5 +1,6 @@
 package com.github.balloonupdate.mcpatch.client.data;
 
+import com.github.balloonupdate.mcpatch.client.exceptions.McpatchBusinessException;
 import com.github.balloonupdate.mcpatch.client.logging.Log;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -17,10 +18,18 @@ public class IndexFile {
         versions = new ArrayList<>();
     }
 
-    public static IndexFile loadFromJson(String json) {
+    public static IndexFile loadFromJson(String json) throws McpatchBusinessException {
         IndexFile indexFile = new IndexFile();
 
-        JSONArray array = new JSONArray(json);
+        JSONArray array;
+        try {
+            array = new JSONArray(json);
+        } catch (RuntimeException e) {
+            throw new McpatchBusinessException("JSON解析失败，原始内容：\n"+json, e);
+//            Log.error(e.toString());
+//            Log.info("RawContent:\n" + json);
+//            throw e;
+        }
 
         for (int i = 0; i < array.length(); i++) {
             JSONObject element = array.getJSONObject(i);
