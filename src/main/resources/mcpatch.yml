@@ -82,9 +82,6 @@ retries: 3
 # 设置 http 系协议是否忽略SSL证书验证
 ignore-ssl-cert: false
 
-# 是否忽略对http协议中content-length的校验
-ignore-http-content-length: false
-
 # 测试模式，专门用来调试更新时的网速
 # 开启后每次都会重头更新，且不会优化任何文件下载
 # 仅用于测试用途，平时正常使用勿开

@@ -3,10 +3,12 @@ package com.github.balloonupdate.mcpatch.client.network.impl;
 import com.github.balloonupdate.mcpatch.client.config.AppConfig;
 import com.github.balloonupdate.mcpatch.client.data.Range;
 import com.github.balloonupdate.mcpatch.client.exceptions.McpatchBusinessException;
+import com.github.balloonupdate.mcpatch.client.logging.Log;
 import com.github.balloonupdate.mcpatch.client.network.UpdatingServer;
 import com.github.balloonupdate.mcpatch.client.utils.BytesUtils;
 import com.github.balloonupdate.mcpatch.client.utils.ReduceReportingFrequency;
 import com.github.balloonupdate.mcpatch.client.utils.RuntimeAssert;
+import kotlin.Pair;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
@@ -160,11 +162,22 @@ public class HttpProtocol implements UpdatingServer {
         // 拼接 URL
         String url = baseUrl + path;
 
+        Log.debug("Http Request URL: " + url);
+
         // 构建请求
         Request req = buildRequest(url, range, null);
 
         try {
+
             Response rsp = client.newCall(req).execute();
+
+//            for (Pair<? extends String, ? extends String> header : req.headers()) {
+//                Log.info("Req Header: " + header.component1() + ": " + header.component2());
+//            }
+//            for (Pair<? extends String, ? extends String> header : rsp.headers()) {
+//                Log.info("Rsp Header: " + header.component1() + ": " + header.component2());
+//            }
+
             int code = rsp.code();
 
             // 检查状态码
@@ -175,22 +188,6 @@ public class HttpProtocol implements UpdatingServer {
                 String content = String.format("服务器(%d)返回了 %d 而不是206: %s (%s)\n%s", number, code, path, desc, body);
 
                 throw new McpatchBusinessException(content);
-            }
-
-            if (!config.ignoreHttpContentLength)
-            {
-                // 检查content-length
-                long len = rsp.body().contentLength();
-
-                if (len == -1) {
-                    throw new McpatchBusinessException(String.format("服务器(%d)没有返回 content-length 头：%s (%s)", number, path, desc));
-                }
-
-                if (range.len() > 0 && len != range.len()) {
-                    String text = String.format("服务器(%d)返回的 content-length 头 %d 不等于 %d: %s", number, len, range.len(), path);
-
-                    throw new McpatchBusinessException(text);
-                }
             }
 
             return rsp;
@@ -246,14 +243,12 @@ public class HttpProtocol implements UpdatingServer {
                 context = SSLContext.getInstance("TLS");
 
                 trustManager = new X509TrustManager() {
-                    public void checkClientTrusted(X509Certificate[] paramArrayOfX509Certificate, String paramString) { }
-
-                    public void checkServerTrusted(X509Certificate[] paramArrayOfX509Certificate, String paramString) { }
-
-                    public X509Certificate[] getAcceptedIssuers() { return new X509Certificate[0]; }
+                    public void checkClientTrusted(X509Certificate[] chain, String authType) {}
+                    public void checkServerTrusted(X509Certificate[] chain, String authType) {}
+                    public X509Certificate[] getAcceptedIssuers() { return new X509Certificate[]{}; }
                 };
 
-                context.init(null, new TrustManager[]{ trustManager }, null);
+                context.init(null, new TrustManager[]{ trustManager }, new java.security.SecureRandom());
             } catch (NoSuchAlgorithmException | KeyManagementException e) {
                 throw new RuntimeException(e);
             }
