@@ -429,6 +429,8 @@ public class Work {
             for (TempUpdateFile f : updateFiles) {
                 String filename = PathUtility.getFilename(f.path);
 
+                Log.openIndent(f.label);
+
                 Log.debug("  a.开始下载 " + f.path);
                 Log.debug("    Download " + f.tempPath);
 
@@ -494,6 +496,8 @@ public class Work {
 
                 if (!hash.equals(f.hash))
                     throw new McpatchBusinessException(String.format("临时文件校验失败，预期 %s，实际 %s，文件路径 %s", f.hash, hash, f.tempPath.toFile().getAbsolutePath()));
+
+                Log.closeIndent();
             }
 
             if (window != null)

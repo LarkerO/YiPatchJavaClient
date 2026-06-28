@@ -332,7 +332,7 @@ public class Main {
             else {
                 // 开发时必须要有外部配置文件
                 if (Env.isDevelopment()) {
-                    throw new McpatchBusinessException("找不到配置文件: mcpatch.yml，开发时必须要有配置文件");
+                    throw new McpatchBusinessException("找不到配置文件: mcpatch.yml，开发时必须要有配置文件 " + external);
                 }
 
                 // 读取内部配置文件
