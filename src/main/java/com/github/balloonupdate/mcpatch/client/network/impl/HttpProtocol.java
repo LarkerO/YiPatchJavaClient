@@ -72,6 +72,7 @@ public class HttpProtocol implements UpdatingServer {
             IgnoreSSLCert ignore = new IgnoreSSLCert();
 
             builder.sslSocketFactory(ignore.context.getSocketFactory(), ignore.trustManager);
+            builder.hostnameVerifier((hostname, session) -> true);
         }
 
         client = builder
