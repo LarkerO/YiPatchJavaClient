@@ -8,9 +8,16 @@ val debugVersion: String get() = System.getenv("DBG_VERSION") ?: "0.0.0"
 group = "com.github.balloonupdate"
 version = gitTagName?.run { getVersionName(this) } ?: debugVersion
 
+
 plugins {
     id("java")
-    id("com.github.johnrengelman.shadow") version "7.1.2"
+    id("com.gradleup.shadow") version "9.4.2"
+}
+
+java {
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(8))
+    }
 }
 
 repositories {
